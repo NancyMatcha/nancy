@@ -1,774 +1,662 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>车轮为什么是圆的？· 数学骑行小实验</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --paper:#FAF3E4; --ink:#2C332B; --red:#E4572E; --yellow:#E9A03B;
-    --blue:#3E7C8F; --green:#4F7D5D; --card:#FFFDF6;
-  }
-  *{box-sizing:border-box; margin:0; padding:0;}
-  body{
-    background:var(--paper); color:var(--ink);
-    font-family:'Noto Sans SC',sans-serif;
-    min-height:100vh; padding:26px 16px 40px;
-  }
-  body::before{
-    content:""; position:fixed; inset:0; pointer-events:none; z-index:9; opacity:.5;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.2 0 0 0 0 0.18 0 0 0 0 0.14 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
-  .wrap{max-width:980px; margin:0 auto;}
-  header{margin-bottom:16px;}
-  h1{
-    font-family:'ZCOOL KuaiLe'; font-weight:400; font-size:clamp(26px,4.4vw,38px);
-    letter-spacing:1px;
-  }
-  h1 em{
-    font-style:normal; color:var(--red);
-    text-decoration:underline wavy var(--yellow) 3px; text-underline-offset:7px;
-  }
-  .sub{margin-top:8px; font-size:14px; color:#5c6157;}
-  .sub b{color:var(--red); font-weight:700;}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>圆的面积公式推导 · 化圆为方</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-  .stage{
-    border:3px solid var(--ink); border-radius:16px; overflow:hidden;
-    box-shadow:7px 7px 0 rgba(44,51,43,.85); background:#FDF7E8; line-height:0;
-  }
-  canvas{width:100%; aspect-ratio:900/440; display:block; touch-action:manipulation;}
+    body {
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #e8f2fa;
+      color: #1e3c3c;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 16px;
+    }
 
-  .controls{
-    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
-    margin-top:20px; padding:14px 16px;
-    border:2.5px solid var(--ink); border-radius:14px; background:var(--card);
-    box-shadow:5px 5px 0 rgba(44,51,43,.85);
-  }
-  .shape-group{display:flex; gap:8px; flex-wrap:wrap;}
-  button{
-    font-family:'ZCOOL KuaiLe','Noto Sans SC',sans-serif; color:var(--ink);
-    background:#fff; border:2.5px solid var(--ink); border-radius:12px;
-    box-shadow:3px 3px 0 var(--ink); cursor:pointer; transition:transform .1s, box-shadow .1s, background .15s;
-  }
-  button:active{transform:translate(2px,2px); box-shadow:1px 1px 0 var(--ink);}
-  .shape-btn{
-    display:flex; flex-direction:column; align-items:center; gap:3px;
-    padding:7px 9px 5px; min-width:60px; font-size:14px; letter-spacing:1px;
-  }
-  .shape-btn svg{display:block;}
-  .shape-btn.active{background:var(--c); color:#fff; transform:translate(1px,1px); box-shadow:2px 2px 0 var(--ink);}
-  .shape-btn.active .sh{fill:#fff !important;}
+    .container {
+      max-width: 900px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 32px;
+      box-shadow: 0 12px 30px rgba(60, 100, 160, 0.15);
+      padding: 24px 24px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
 
-  .speed-ctl{display:flex; align-items:center; gap:10px; flex:1; min-width:200px;}
-  .speed-ctl .title{font-family:'ZCOOL KuaiLe'; font-size:15px; letter-spacing:2px; white-space:nowrap;}
-  .speed-ctl .lbl{font-size:12px; color:#7a7f72;}
-  input[type=range]{
-    flex:1; -webkit-appearance:none; appearance:none; height:10px; border-radius:6px;
-    background:#EFE4C8; border:2px solid var(--ink); outline:none; cursor:pointer;
-  }
-  input[type=range]::-webkit-slider-thumb{
-    -webkit-appearance:none; width:22px; height:22px; border-radius:50%;
-    background:var(--red); border:2.5px solid var(--ink); box-shadow:1.5px 1.5px 0 var(--ink);
-  }
-  input[type=range]::-moz-range-thumb{
-    width:18px; height:18px; border-radius:50%;
-    background:var(--red); border:2.5px solid var(--ink);
-  }
-  .pause-btn{display:flex; align-items:center; gap:7px; padding:10px 16px; font-size:16px; letter-spacing:2px;}
-  .pause-btn svg{display:block;}
+    h1 {
+      font-size: 1.9rem;
+      font-weight: 600;
+      color: #1a4a7a;
+      text-align: center;
+      letter-spacing: 2px;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
 
-  .tip{
-    display:flex; gap:14px; margin-top:18px; padding:14px 18px;
-    border:2.5px solid var(--ink); border-radius:14px; background:var(--card);
-    box-shadow:5px 5px 0 rgba(44,51,43,.85);
-  }
-  .tip-bar{width:9px; border-radius:6px; background:var(--tc,var(--red)); flex:none;}
-  .tip-body h3{font-family:'ZCOOL KuaiLe'; font-weight:400; font-size:19px; letter-spacing:1px;}
-  .tip-body p{margin-top:5px; font-size:14px; line-height:1.75;}
-  .tip-body .math{
-    margin-top:7px; font-weight:700; color:var(--tc,var(--red)); font-size:13.5px;
-    background:rgba(44,51,43,.06); display:inline-block; padding:3px 10px; border-radius:8px;
-  }
-  .tip.pop{animation:pop .35s ease;}
-  @keyframes pop{from{transform:translateY(7px) scale(.985); opacity:.25;}}
-  footer{margin-top:16px; font-size:13px; color:#7a7f72; line-height:1.7;}
-  footer b{color:var(--ink);}
-</style>
+    h1 span {
+      background: #dceaf8;
+      padding: 4px 18px;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: 400;
+      color: #2a5a8a;
+    }
+
+    .canvas-wrapper {
+      position: relative;
+      width: 100%;
+      background: #f0f7fd;
+      border-radius: 28px;
+      padding: 8px;
+      box-shadow: inset 0 0 0 1px #c8ddf0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    canvas {
+      width: 100%;
+      height: auto;
+      max-width: 640px;
+      aspect-ratio: 4 / 3;
+      display: block;
+      border-radius: 20px;
+      background: #f7fbff;
+      touch-action: none;
+    }
+
+    .explain-box {
+      background: #e4eef9;
+      border-left: 6px solid #3a7abf;
+      padding: 22px 24px;
+      border-radius: 18px;
+      font-size: 1.05rem;
+      line-height: 1.9;
+      color: #1a3a5c;
+      min-height: 5rem;
+      display: block;
+      transition: background 0.2s;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+      word-break: break-word;
+    }
+
+    .explain-box strong { color: #1a4a7a; font-weight: 700; }
+
+    .explain-box .formula {
+      font-family: "Courier New", monospace;
+      background: #fff3c4;
+      color: #a06010;
+      padding: 2px 10px;
+      border-radius: 8px;
+      font-weight: 700;
+      display: inline-block;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px 8px;
+      background: #eef5fc;
+      border-radius: 30px;
+      padding: 12px 18px;
+      margin-top: 4px;
+      border: 1px solid #c2d8ec;
+    }
+
+    .ctrl-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    .ctrl-group label { font-size: 0.9rem; font-weight: 500; color: #2a5a8a; white-space: nowrap; }
+
+    button {
+      background: white;
+      border: 2px solid #3a7abf;
+      color: #1a4a7a;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 40px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    button:hover { background: #dceaf8; border-color: #2a5a9a; transform: scale(1.02); }
+    button.primary { background: #3a7abf; color: white; border-color: #3a7abf; }
+    button.primary:hover { background: #2a5a9a; }
+    button.step { background: #fff4e0; border-color: #e8a030; color: #a06010; }
+    button.step:hover { background: #ffe8c0; border-color: #d09020; }
+
+    input[type="range"] {
+      width: 150px;
+      height: 6px;
+      -webkit-appearance: none;
+      background: #b8d0e8;
+      border-radius: 10px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #3a7abf;
+      border: 2px solid white;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #3a7abf;
+      border: 2px solid white;
+      cursor: pointer;
+    }
+
+    .value-badge {
+      background: white;
+      border-radius: 20px;
+      padding: 2px 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #1a4a7a;
+      min-width: 50px;
+      text-align: center;
+      border: 1px solid #b0cce8;
+    }
+
+    .stage-indicator { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+
+    .stage-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #c2d8ec;
+      transition: all 0.25s;
+    }
+
+    .stage-dot.active {
+      background: #3a7abf;
+      transform: scale(1.3);
+      box-shadow: 0 0 0 3px rgba(58, 122, 191, 0.2);
+    }
+
+    .stage-dot.done { background: #6aabdf; }
+
+    .stage-label { font-size: 0.8rem; color: #5a7a9a; margin-left: 4px; }
+
+    .footer-note { font-size: 0.8rem; color: #6a8aaa; text-align: center; margin-top: 4px; }
+
+    @media (max-width: 600px) {
+      .container { padding: 16px; }
+      h1 { font-size: 1.4rem; }
+      .controls { flex-direction: column; align-items: stretch; }
+      .ctrl-group { justify-content: space-between; }
+      .explain-box { font-size: 0.95rem; padding: 18px 18px; line-height: 1.8; }
+    }
+  </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <h1>车轮为什么是<em>圆</em>的？</h1>
-    <p class="sub">换上不同形状的车轮骑一骑，盯着轮心画出的<b>"轮心轨迹"</b>——答案就藏在"半径"里！</p>
-  </header>
+  <div class="container">
+    <h1>
+      📐 圆的面积公式推导
+      <span>化圆为方</span>
+    </h1>
 
-  <div class="stage"><canvas id="cv"></canvas></div>
+    <div class="canvas-wrapper">
+      <canvas id="circleCanvas" width="800" height="600"></canvas>
+    </div>
 
-  <div class="controls">
-    <div class="shape-group" role="group" aria-label="选择车轮形状">
-      <button class="shape-btn active" data-shape="circle" style="--c:#E4572E">
-        <svg width="26" height="26" viewBox="0 0 26 26"><circle class="sh" cx="13" cy="13" r="9" fill="#F7D9CB" stroke="#2C332B" stroke-width="2.2"/></svg>
-        <span>圆形</span>
-      </button>
-      <button class="shape-btn" data-shape="ellipse" style="--c:#E9A03B">
-        <svg width="26" height="26" viewBox="0 0 26 26"><ellipse class="sh" cx="13" cy="13" rx="10.5" ry="7.5" fill="#F8E4C2" stroke="#2C332B" stroke-width="2.2"/></svg>
-        <span>椭圆</span>
-      </button>
-      <button class="shape-btn" data-shape="triangle" style="--c:#4F7D5D">
-        <svg width="26" height="26" viewBox="0 0 26 26"><path class="sh" d="M13 4 L22.5 21 H3.5 Z" fill="#D7E4DA" stroke="#2C332B" stroke-width="2.2"/></svg>
-        <span>三角形</span>
-      </button>
-      <button class="shape-btn" data-shape="square" style="--c:#3E7C8F">
-        <svg width="26" height="26" viewBox="0 0 26 26"><rect class="sh" x="4.5" y="4.5" width="17" height="17" fill="#D3E2E7" stroke="#2C332B" stroke-width="2.2"/></svg>
-        <span>正方形</span>
-      </button>
-      <button class="shape-btn" data-shape="pentagon" style="--c:#8A62A8">
-        <svg width="26" height="26" viewBox="0 0 26 26"><path class="sh" d="M13 3 L22.5 9.9 L18.9 21.1 L7.1 21.1 L3.5 9.9 Z" fill="#E7DBEF" stroke="#2C332B" stroke-width="2.2"/></svg>
-        <span>正五边形</span>
-      </button>
-      <button class="shape-btn" data-shape="hexagon" style="--c:#4A5FA5">
-        <svg width="26" height="26" viewBox="0 0 26 26"><path class="sh" d="M8 21.7 L3 13 L8 4.3 L18 4.3 L23 13 L18 21.7 Z" fill="#D9DEF0" stroke="#2C332B" stroke-width="2.2"/></svg>
-        <span>正六边形</span>
-      </button>
+    <div class="explain-box" id="explainBox">
+      点击 <strong>开始演示</strong>，观察圆如何一步步变成近似长方形 ✨
     </div>
-    <div class="speed-ctl">
-      <span class="title">骑行速度</span>
-      <span class="lbl">慢</span>
-      <input type="range" id="speed" min="30" max="330" value="150" aria-label="骑行速度">
-      <span class="lbl">快</span>
+
+    <div class="controls">
+      <div class="ctrl-group">
+        <label>等分份数</label>
+        <input type="range" id="partsSlider" min="0" max="7" step="1" value="3">
+        <span class="value-badge" id="partsValue">32</span>
+      </div>
+
+      <div class="ctrl-group">
+        <button class="step" id="stepBtn">⏭ 分步演示</button>
+        <button class="primary" id="startBtn">▶ 连续演示</button>
+        <button id="resetBtn">↺ 重置</button>
+      </div>
     </div>
-    <button id="pauseBtn" class="pause-btn" aria-label="暂停或继续">
-      <svg id="icoPause" viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><rect x="5.5" y="4" width="4.6" height="16" rx="1.4"/><rect x="13.9" y="4" width="4.6" height="16" rx="1.4"/></svg>
-      <svg id="icoPlay" viewBox="0 0 24 24" width="17" height="17" fill="currentColor" style="display:none"><path d="M7 4.5 L20 12 L7 19.5 Z"/></svg>
-      <span id="pauseTxt">暂停</span>
-    </button>
+
+    <div class="stage-indicator">
+      <div class="stage-dot active" data-stage="0"></div>
+      <div class="stage-dot" data-stage="1"></div>
+      <div class="stage-dot" data-stage="2"></div>
+      <div class="stage-dot" data-stage="3"></div>
+      <span class="stage-label" id="stageLabel">阶段 1/4：认识圆</span>
+    </div>
+
+    <div class="footer-note">拖动滑块改变等分份数 · 份数越多，拼成的图形越接近长方形</div>
   </div>
 
-  <aside class="tip" id="tip">
-    <div class="tip-bar" id="tipBar"></div>
-    <div class="tip-body">
-      <h3 id="tipTitle"></h3>
-      <p id="tipText"></p>
-      <span class="math" id="tipMath"></span>
-    </div>
-  </aside>
+  <script>
+    (function() {
+      const canvas = document.getElementById('circleCanvas');
+      const ctx = canvas.getContext('2d');
+      const explainBox = document.getElementById('explainBox');
+      const partsSlider = document.getElementById('partsSlider');
+      const partsValue = document.getElementById('partsValue');
+      const startBtn = document.getElementById('startBtn');
+      const resetBtn = document.getElementById('resetBtn');
+      const stepBtn = document.getElementById('stepBtn');
+      const stageDots = document.querySelectorAll('.stage-dot');
+      const stageLabel = document.getElementById('stageLabel');
 
-  <footer><b>课后小实验：</b>按 <b>三角形 → 正方形 → 五边形 → 六边形</b> 的顺序换轮子，盯着"轮心轨迹"——曲线是不是越来越平？再用硬纸板剪几个正多边形推一推，想想：边数一直增加下去，最后会得到什么图形？</footer>
-</div>
+      const CANVAS_W = 800;
+      const CANVAS_H = 600;
+      canvas.width = CANVAS_W;
+      canvas.height = CANVAS_H;
 
-<script>
-/* =========================================================
-   车轮为什么是圆的？—— 数学骑行小实验
-   核心：轮心（车轴）高度用真实几何计算。
-   · 圆 = 半径恒定，轨迹是水平直线
-   · 椭圆 = 支撑函数，平滑起伏
-   · 正 n 边形 = 绕尖角翻转：
-     轴高 h(u) = R·sin(π/2 − π/n + u·2π/n)，R = a/cos(π/n)
-     a = 内切半径（决定轮子大小，即平边贴地时的轮心高度）
-     n=3..6 同一套公式；n→∞ 的极限就是圆
-========================================================= */
-const cv = document.getElementById('cv');
-const ctx = cv.getContext('2d');
+      const R = 120;
+      const CIRCLE_CX = CANVAS_W / 2;
+      const CIRCLE_CY = CANVAS_H / 2 + 10;
+      const PARA_CY = CANVAS_H / 2 - 10;
 
-/* ---------- 世界常量（逻辑画布 900 × 440） ---------- */
-const VW = 900, VH = 440;
-const GROUND_Y = 356;
-const CAR_X = 306;
-const WHEEL_R = 46;                 // 圆轮半径（尺寸基准）
+      const STAGES = [
+        { progress: 0,    name: '认识圆' },
+        { progress: 0.55, name: '分成两排' },
+        { progress: 1.0,  name: '交错咬合' },
+        { progress: 1.0,  name: '标注公式' }
+      ];
+      let currentStage = 0;
 
-/* ---------- 车轮形状参数（三角形与椭圆已按圆轮比例缩小） ---------- */
-const ELL_A = 54, ELL_B = 42;       // 椭圆半轴：108 × 84（原 128 × 92）
-const ELL_C = Math.PI * (3*(ELL_A+ELL_B) - Math.sqrt((3*ELL_A+ELL_B)*(ELL_A+3*ELL_B)));
-const SHAPES = {
-  circle:  { name:'圆形',   color:'#E4572E', light:'#F7D9CB' },
-  ellipse: { name:'椭圆',   color:'#E9A03B', light:'#F8E4C2' },
-  triangle:{ name:'三角形', color:'#4F7D5D', light:'#D7E4DA', n:3, a:27.7, impact:1.0 },  // 边长≈96
-  square:  { name:'正方形', color:'#3E7C8F', light:'#D3E2E7', n:4, impact:0.6 },
-  pentagon:{ name:'正五边形', color:'#8A62A8', light:'#E7DBEF', n:5, impact:0.38 },
-  hexagon: { name:'正六边形', color:'#4A5FA5', light:'#D9DEF0', n:6, impact:0.24 },
-};
-/* 正 n 边形：a = 内切半径（未指定则取 46），外接半径 Rv = a/cos(π/n)，边长 s = 2a·tan(π/n) */
-for (const k in SHAPES){
-  const c = SHAPES[k];
-  if (c.n){ c.a = c.a ?? WHEEL_R; c.Rv = c.a / Math.cos(Math.PI/c.n); c.s = 2*c.a*Math.tan(Math.PI/c.n); }
-}
-const mod = (x, m) => ((x % m) + m) % m;
+      let partsCount = 32;
+      let animationProgress = 0;
+      let targetProgress = 0;
+      let isPlaying = false;
+      let animationFrame = null;
+      let lastTimestamp = 0;
+      const FIXED_SPEED = 0.8;
+      let forceShowAnnotation = false;
 
-/* 轮心高度：d = 已前进距离 + 相位偏移 */
-function axleH(shape, d){
-  if (shape === 'circle') return WHEEL_R;
-  if (shape === 'ellipse'){
-    const p = d * 2 * Math.PI / ELL_C;
-    return Math.hypot(ELL_A * Math.sin(p), ELL_B * Math.cos(p));
-  }
-  const c = SHAPES[shape];
-  const u = mod(d, c.s) / c.s;
-  return c.Rv * Math.sin(Math.PI/2 - Math.PI/c.n + u * 2*Math.PI/c.n);
-}
-/* 车轮累计自转角（向前骑 = 屏幕上顺时针） */
-function wheelSpin(shape, d){
-  if (shape === 'circle')  return d / WHEEL_R;
-  if (shape === 'ellipse') return d * 2 * Math.PI / ELL_C;
-  const c = SHAPES[shape];
-  return d / c.s * 2 * Math.PI / c.n;
-}
+      const BLUE = '#4A90D9';
+      const RED = '#E85D5D';
+      const EDGE = 'rgba(255,255,255,0.85)';
+      const CIRCLE_FILL = '#D6E8F7';
+      const CIRCLE_STROKE = '#4A90D9';
 
-/* ---------- 全局状态 ---------- */
-let shape = 'circle';
-let D = 0, off = 0;
-let speed = 150;
-let paused = false;
-let uPrev = 0, hPrev = null, dvS = 0;
-let bob = 0, bobV = 0, shake = 0, switchFx = 0, jolt = 0;
-let fd = 0, fdv = 0;          // 悬挂弹簧：车架相对轮轴的缓冲偏移（吸收换轮高度差）
-let sunT = 0;
-let particles = [];
+      function sliderIndexToParts(index) {
+        const map = [4, 8, 16, 32, 64, 128, 256, 512];
+        return map[Math.min(index, map.length - 1)];
+      }
 
-/* ---------- 轮心轨迹：按前进距离采样（不受速度/暂停影响） ---------- */
-const TRAIL_STEP = 3;
-const trail = [];               // {T: 采样时的累计路程, h: 轮心高度, c: 当时轮子颜色}
-let lastTrailD = -1;
+      function updatePartsDisplay() { partsValue.textContent = partsCount; }
 
-const scarf = Array.from({length:6}, () => ({x:0,y:0,px:0,py:0,init:false}));
+      function updateStageIndicator() {
+        stageDots.forEach((dot, i) => {
+          dot.classList.remove('active', 'done');
+          if (i < currentStage) dot.classList.add('done');
+          if (i === currentStage) dot.classList.add('active');
+        });
+        stageLabel.textContent = `阶段 ${currentStage + 1}/4：${STAGES[currentStage].name}`;
+      }
 
-/* ---------- 尺寸自适应 ---------- */
-let scale = 1;
-function resize(){
-  const w = cv.clientWidth;
-  scale = w / VW;
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  cv.width  = Math.round(w * dpr);
-  cv.height = Math.round(w * VH / VW * dpr);
-  ctx.setTransform(dpr * scale, 0, 0, dpr * scale, 0, 0);
-}
-window.addEventListener('resize', resize);
-resize();
+      function setExplainText(progress, stageOverride) {
+        const stage = (stageOverride !== undefined) ? stageOverride : currentStage;
+        let html = '';
 
-/* ---------- 形状切换：相位求解 + 悬挂缓冲，保证高度尽量连续 ---------- */
-const TIPS = {
-  circle:  { t:'圆形车轮 · 又稳又快', p:'圆上每一点到圆心（轮心）的距离都相等，这段距离叫"半径"。不管轮子转到哪里，轮心离地面都一样高，看它画出的轨迹——是一条平直的线！', m:'数学点：半径处处相等 → 轮心轨迹是水平直线' },
-  ellipse: { t:'椭圆形车轮 · 一起一伏', p:'椭圆上各点到中心的距离忽长忽短，轮子每转半圈，轮心就先升高、再降低，轨迹是平滑的波浪线，一会儿在圆轮线上方、一会儿在下方。', m:'数学点：到中心的距离不断变化 → 轨迹是波浪' },
-  triangle:{ t:'三角形车轮 · 颠翻啦！', p:'三角形的尖角最尖、落差最大，每翻一下就把整车弹起老高，轮心轨迹是一串又高又尖的弧线，根本没法骑。', m:'数学点：角最尖 → 落差最大 → 颠得最凶' },
-  square:  { t:'正方形车轮 · 哐当哐当', p:'正方形没法"滚"，只能绕着尖角一下一下地"翻跟头"。每翻过一个角，轮心就沿弧线升高再落下，人跟着一颠一颠。', m:'数学点：轮心轨迹 = 一串圆弧拼成的"波浪"' },
-  pentagon:{ t:'正五边形车轮 · 颠得轻了些', p:'比正方形多了一条边，角也"钝"了一点，翻起来落差变小，轨迹的起伏变浅了。但轮心高度还是在变，所以依然颠。', m:'数学点：边越多、角越钝 → 起伏越小' },
-  hexagon: { t:'正六边形车轮 · 越来越像圆', p:'边数越多，每个角越钝，轮心轨迹越接近一条直线。大胆想一想：如果边数一直增加下去，最后会变成什么？——就是圆！', m:'数学点：正多边形边数越多 → 越接近圆' },
-};
-const tipEl = document.getElementById('tip');
-function updateTip(){
-  const c = SHAPES[shape], tip = TIPS[shape];
-  document.getElementById('tipTitle').textContent = tip.t;
-  document.getElementById('tipText').textContent  = tip.p;
-  document.getElementById('tipMath').textContent  = tip.m;
-  document.getElementById('tipBar').style.background = c.color;
-  document.getElementById('tipMath').style.setProperty('--tc', c.color);
-  tipEl.classList.remove('pop'); void tipEl.offsetWidth; tipEl.classList.add('pop');
-}
-function setShape(s){
-  if (s === shape) return;
-  const H = axleH(shape, D + off);        // 换轮前瞬间的轮心高度
-  shape = s;
-  const c = SHAPES[s];
-  if (s === 'circle'){
-    off = 0;                              // 圆没有相位，残余高度差交给悬挂
-  } else if (s === 'ellipse'){
-    // 解相位：让新椭圆的轮心高度恰好等于 H（H 超出 [b,a] 时夹到端点）
-    const Hc = Math.max(ELL_B, Math.min(ELL_A, H));
-    const sp = Math.sqrt(Math.max(0, Math.min(1, (Hc*Hc - ELL_B*ELL_B) / (ELL_A*ELL_A - ELL_B*ELL_B))));
-    const p0 = Math.asin(sp);             // 上升分支
-    off = mod(p0 * ELL_C / (2*Math.PI) - D, ELL_C / 2);
-  } else {
-    // 解相位：Rv·sin(θ0 + u·2π/n) = H（H 超出 [a,Rv] 时夹到端点）
-    const Hc = Math.max(c.a, Math.min(c.Rv, H));
-    const al = Math.asin(Hc / c.Rv);
-    const u0 = mod((al - (Math.PI/2 - Math.PI/c.n)) * c.n / (2*Math.PI), 1);
-    off = mod(u0 * c.s - D, c.s);
-    uPrev = mod(D + off, c.s) / c.s;
-  }
-  fd = H - axleH(shape, D + off);         // 残余高度差 → 车架悬挂缓冲（~0.3s 缓掉）
-  fdv = 0;
-  switchFx = 1;
-  dust(CAR_X, GROUND_Y, 5, .7); dust(CAR_X + 150, GROUND_Y, 4, .7);
-  document.querySelectorAll('.shape-btn').forEach(b => b.classList.toggle('active', b.dataset.shape === s));
-  updateTip();
-}
-document.querySelectorAll('.shape-btn').forEach(b => b.addEventListener('click', () => setShape(b.dataset.shape)));
+        if (stage === 0) {
+          html = `🔵 这是一个半径为 <strong>r</strong> 的圆，周长 <strong>C = 2πr</strong>。`;
+        } else if (stage === 1) {
+          html = `📋 把圆平均分成 <strong>${partsCount} 份</strong>小扇形，蓝色扇形尖口朝下排成一排，红色扇形尖口朝上排成一排。`;
+        } else if (stage === 2) {
+          html = `🧩 红色扇形整体向右滑半个扇形，与蓝色扇形上下交错咬合，拼成近似长方形。`;
+        } else if (stage === 3) {
+          html = `📏 拼成的近似长方形：长 ≈ πr，宽 ≈ r<br>
+                  📐 面积 = 长 × 宽 = πr × r = πr²<br>
+                  ✅ 所以圆的面积公式是 <span class="formula">S = πr²</span><br>
+                  ✨ 分的份数越多，拼成的图形越接近长方形！`;
+        }
 
-/* ---------- 暂停 / 速度 ---------- */
-const pauseTxt = document.getElementById('pauseTxt');
-const icoPause = document.getElementById('icoPause'), icoPlay = document.getElementById('icoPlay');
-function togglePause(){
-  paused = !paused;
-  pauseTxt.textContent = paused ? '继续' : '暂停';
-  icoPause.style.display = paused ? 'none' : 'block';
-  icoPlay.style.display  = paused ? 'block' : 'none';
-}
-document.getElementById('pauseBtn').addEventListener('click', togglePause);
-window.addEventListener('keydown', e => {
-  if (e.code === 'Space'){ e.preventDefault(); togglePause(); }
-});
-document.getElementById('speed').addEventListener('input', e => speed = +e.target.value);
+        explainBox.innerHTML = html;
+      }
 
-/* ---------- 尘土粒子 ---------- */
-function dust(x, y, n, pow = 1){
-  for (let i = 0; i < n; i++) particles.push({
-    x: x + Math.random()*26 - 13, y: y - 2,
-    vx: -(30 + Math.random()*95) * pow, vy: -(45 + Math.random()*115) * pow,
-    r: 1.6 + Math.random()*3.4, life: .5 + Math.random()*.45, t: 0
-  });
-}
-function updateParticles(dt){
-  for (let i = particles.length - 1; i >= 0; i--){
-    const p = particles[i];
-    p.t += dt;
-    if (p.t > p.life){ particles.splice(i,1); continue; }
-    p.vy += 400 * dt;
-    p.x += p.vx * dt - speed * dt;
-    p.y += p.vy * dt;
-    if (p.y > GROUND_Y - 1){ p.y = GROUND_Y - 1; p.vy *= -.35; p.vx *= .6; }
-  }
-}
+      function easeInOutSine(t) { return -(Math.cos(Math.PI * t) - 1) / 2; }
 
-/* ---------- 落地冲击（多边形每翻过一个尖角触发） ---------- */
-function landImpact(k){
-  jolt = Math.max(jolt, k);
-  bobV += 95 * k;
-  shake = Math.min(7, shake + 3 * k);
-  dust(CAR_X, GROUND_Y, 4 + 3*k, .8 + .4*k);
-  dust(CAR_X + 150, GROUND_Y, 3 + 2*k, .7 + .4*k);
-}
+      function drawCanvas() {
+        ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+        const progress = animationProgress;
+        const easeProgress = easeInOutSine(progress);
 
-/* ---------- 每帧动力学 + 轨迹采样 ---------- */
-function updateDynamics(dt){
-  const d = D + off;
-  const h = axleH(shape, d);
-  if (SHAPES[shape].n){
-    const c = SHAPES[shape];
-    const u = mod(d, c.s) / c.s;
-    if (u < uPrev) landImpact(c.impact);
-    uPrev = u;
-  }
-  if (hPrev === null) hPrev = h;
-  const dv = (h - hPrev) / dt; hPrev = h;
-  dvS += (dv - dvS) * Math.min(1, dt * 9);
-  bobV += (-bob * 130 - bobV * 9) * dt;
-  bob = Math.max(-9, Math.min(9, bob + bobV * dt));
-  // 悬挂弹簧：换轮高度差在约 0.3 秒内缓掉（轮子始终贴地，只有车架缓冲）
-  fdv += (-fd * 180 - fdv * 17) * dt;
-  fd = Math.max(-24, Math.min(24, fd + fdv * dt));
+        drawSectorsAndParallelogram(easeProgress, forceShowAnnotation);
+      }
 
-  // 轮心轨迹：每前进 3px 记录一个点（含当时轮子的颜色，换轮时轨迹分段变色）
-  if (lastTrailD < 0) lastTrailD = D;
-  while (D - lastTrailD >= TRAIL_STEP){
-    lastTrailD += TRAIL_STEP;
-    trail.push({ T: lastTrailD, h: axleH(shape, lastTrailD + off), c: SHAPES[shape].color });
-  }
-  while (trail.length && CAR_X - (D - trail[0].T) < -40) trail.shift();
+      function drawSectorsAndParallelogram(easeT, showAnnotation) {
+        const N = partsCount;
+        const angleStep = (Math.PI * 2) / N;
+        const halfN = N / 2;
 
-  updateScarf();
-}
+        const halfAngle = angleStep / 2;
+        const sinHalf = Math.sin(halfAngle);
+        const cosHalf = Math.cos(halfAngle);
+        const chordLen = 2 * R * sinHalf;
 
-/* ---------- 围巾（绳索物理） ---------- */
-function neckPos(rx, ry){
-  const R = riderPts(rx, ry, 0);
-  return { x: R.shoulder.x + 3, y: R.shoulder.y - 7 };
-}
-function updateScarf(){
-  const d = D + off, h = axleH(shape, d);
-  const root = neckPos(CAR_X, GROUND_Y - h - fd);
-  const p0 = scarf[0];
-  const set = (p, x, y) => { p.x = x; p.y = y; if (!p.init){ p.px = x; p.py = y; p.init = true; } };
-  set(p0, root.x, root.y);
-  const windX = -(speed * .028 + 1.4) - dvS * .018;
-  for (let i = 1; i < scarf.length; i++){
-    const p = scarf[i];
-    const vx = (p.x - p.px) * .9, vy = (p.y - p.py) * .9;
-    p.px = p.x; p.py = p.y;
-    p.x += vx + windX + (Math.random() - .5) * 1.3;
-    p.y += vy + .55 - dvS * .035 + (Math.random() - .5) * 1.1;
-  }
-  for (let k = 0; k < 3; k++)
-    for (let i = 1; i < scarf.length; i++){
-      const a = scarf[i-1], b = scarf[i];
-      const dx = b.x - a.x, dy = b.y - a.y, dist = Math.hypot(dx, dy) || .001;
-      const diff = (dist - 8) / dist;
-      b.x -= dx * diff; b.y -= dy * diff;
-    }
-}
+        const blueApexY = PARA_CY + 40;
+        const redApexY = blueApexY - R * cosHalf;
 
-/* ---------- 骑手关键点 ---------- */
-function riderPts(rx, ry, sway){
-  const hip = { x: rx + 41, y: ry - 66 + bob * .3 };
-  const ang = Math.atan2(-24, 39) + sway;
-  const shoulder = { x: hip.x + Math.cos(ang) * 46, y: hip.y + Math.sin(ang) * 46 + bob * .6 };
-  return { hip, shoulder, head: { x: shoulder.x + 7, y: shoulder.y - 15 } };
-}
-function ik(ax, ay, bx, by, l1, l2, dir){
-  let dx = bx - ax, dy = by - ay;
-  let dist = Math.hypot(dx, dy);
-  const maxD = l1 + l2 - .4;
-  if (dist > maxD){ const s = maxD / dist; dx *= s; dy *= s; dist = maxD; }
-  const a = Math.acos(Math.min(1, Math.max(-1, (dist*dist + l1*l1 - l2*l2) / (2*dist*l1))));
-  const base = Math.atan2(dy, dx) + a * dir;
-  return { x: ax + Math.cos(base) * l1, y: ay + Math.sin(base) * l1 };
-}
+        const blueX0 = CIRCLE_CX - (halfN - 1) * chordLen / 2;
 
-/* =========================================================
-   绘制
-========================================================= */
-function tube(x1,y1,x2,y2,w,color){
-  ctx.strokeStyle = color; ctx.lineWidth = w; ctx.lineCap = 'round';
-  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
-}
+        const rowT = Math.min(Math.max((easeT - 0.2) / 0.35, 0), 1);
+        const interlockT = Math.min(Math.max((easeT - 0.55) / 0.45, 0), 1);
 
-/* ---------- 轮心轨迹线（画在场景里，留在轮子后方） ---------- */
-function drawTrail(){
-  if (trail.length < 2) return;
-  ctx.save();
-  ctx.globalAlpha = .6; ctx.lineCap = 'round'; ctx.lineWidth = 3;
-  for (let i = 1; i < trail.length; i++){
-    const a = trail[i-1], b = trail[i];
-    const xb = CAR_X - (D - b.T);
-    if (xb < -10) continue;
-    ctx.strokeStyle = b.c;
-    ctx.beginPath();
-    ctx.moveTo(CAR_X - (D - a.T), GROUND_Y - a.h);
-    ctx.lineTo(xb, GROUND_Y - b.h);
-    ctx.stroke();
-  }
-  ctx.restore();
-}
+        const redOffsetX = R * sinHalf * interlockT;
 
-function drawWheel(x, y, spin, fx){
-  const c = SHAPES[shape];
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.scale(fx, fx);
-  ctx.rotate(spin);
-  ctx.beginPath();
-  if (shape === 'circle')       ctx.arc(0, 0, WHEEL_R, 0, Math.PI*2);
-  else if (shape === 'ellipse') ctx.ellipse(0, 0, ELL_A, ELL_B, 0, 0, Math.PI*2);
-  else {                          // 正 n 边形：平边贴地姿态
-    const n = c.n, Rv = c.Rv;
-    for (let k = 0; k < n; k++){
-      const a = Math.PI/2 + Math.PI/n + k * 2*Math.PI/n;
-      const px = Math.cos(a)*Rv, py = Math.sin(a)*Rv;
-      k ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
-    }
-    ctx.closePath();
-  }
-  ctx.fillStyle = c.light; ctx.fill();
-  ctx.lineJoin = (shape === 'circle' || shape === 'ellipse') ? 'round' : 'miter';
-  ctx.lineWidth = 7; ctx.strokeStyle = '#2C332B'; ctx.stroke();
-  // 辐条 + 轮毂
-  ctx.strokeStyle = '#2C332B'; ctx.lineWidth = 2.6; ctx.lineCap = 'round';
-  if (shape === 'ellipse'){
-    for (let i = 0; i < 4; i++){
-      const a = i * Math.PI/2, rr = (i % 2 === 0) ? ELL_A-12 : ELL_B-12;
-      ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(Math.cos(a)*rr, Math.sin(a)*rr); ctx.stroke();
-    }
-  } else if (shape === 'circle'){
-    for (let i = 0; i < 4; i++){
-      const a = i * Math.PI/2;
-      ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(Math.cos(a)*(WHEEL_R-11), Math.sin(a)*(WHEEL_R-11)); ctx.stroke();
-    }
-  } else {
-    const n = c.n, Rv = c.Rv;
-    for (let k = 0; k < n; k++){
-      const a = Math.PI/2 + Math.PI/n + k * 2*Math.PI/n;
-      ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(Math.cos(a)*(Rv-13), Math.sin(a)*(Rv-13)); ctx.stroke();
-    }
-  }
-  ctx.beginPath(); ctx.arc(0,0,6.5,0,Math.PI*2);
-  ctx.fillStyle = '#FFFDF6'; ctx.fill();
-  ctx.lineWidth = 2.4; ctx.stroke();
-  ctx.beginPath(); ctx.arc(0,0,2,0,Math.PI*2); ctx.fillStyle = '#2C332B'; ctx.fill();
-  ctx.restore();
-}
+        const showShapeT = Math.min(Math.max((easeT - 0.82) / 0.18, 0), 1);
+        const annotationAlpha = showAnnotation ? 1 : showShapeT;
 
-function drawBike(){
-  const d = D + off;
-  const h = axleH(shape, d);
-  const rx = CAR_X;
-  const ryA = GROUND_Y - h;        // 轮轴：永远贴地的真实高度
-  const ry = ryA - fd;             // 车架：带悬挂缓冲的高度
-  const sway = Math.max(-.12, Math.min(.12, -dvS * .018));
-  const R = riderPts(rx, ry, sway);
-  const surprised = jolt > .45;    // 刚被尖角"砸"过 → 惊讶脸
+        // 圆形底（淡出）
+        if (rowT < 0.95) {
+          ctx.save();
+          ctx.globalAlpha = 1 - rowT * 0.95;
 
-  const spin = wheelSpin(shape, d);
-  const fx = 1 + .16 * switchFx;
-  drawWheel(rx, ryA, spin, fx);
-  drawWheel(rx + 150, ryA, spin, fx);
+          ctx.beginPath();
+          ctx.arc(CIRCLE_CX, CIRCLE_CY, R, 0, Math.PI * 2);
+          ctx.fillStyle = CIRCLE_FILL;
+          ctx.fill();
+          ctx.strokeStyle = CIRCLE_STROKE;
+          ctx.lineWidth = 2;
+          ctx.stroke();
 
-  const shH = Math.max(.4, 1 - (h - 40) / 90);
-  ctx.beginPath();
-  ctx.ellipse(rx + 75, GROUND_Y + 7, 96 * shH, 7.5 * shH, 0, 0, Math.PI*2);
-  ctx.fillStyle = 'rgba(44,51,43,.12)'; ctx.fill();
+          if (rowT < 0.5) {
+            ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+            ctx.lineWidth = 1.5;
+            for (let i = 0; i < N; i++) {
+              const a = i * angleStep - Math.PI / 2;
+              ctx.beginPath();
+              ctx.moveTo(CIRCLE_CX, CIRCLE_CY);
+              ctx.lineTo(CIRCLE_CX + R * Math.cos(a), CIRCLE_CY + R * Math.sin(a));
+              ctx.stroke();
+            }
+          }
 
-  /* 车架：连接轮轴的两根管子下端锚定在轮轴上，其余随车架缓冲 */
-  const A = '#E4572E';
-  tube(rx,    ryA,   rx+40,  ry-68, 7, A);   // 座管（下端接后轴）
-  tube(rx,    ryA,   rx+58,  ry+2,  7, A);   // 后下叉
-  tube(rx+58, ry+2,  rx+40,  ry-68, 7, A);
-  tube(rx+40, ry-68, rx+124, ry-58, 7, A);
-  tube(rx+58, ry+2,  rx+124, ry-58, 7, A);
-  tube(rx+124,ry-58, rx+150, ryA,   6, A);   // 前叉（下端接前轴）
-  tube(rx+124,ry-58, rx+131, ry-65, 6, A);
-  tube(rx+126,ry-64, rx+137, ry-59, 6,'#2C332B');
-  tube(rx+33, ry-70, rx+50,  ry-70, 9,'#2C332B');
-  ctx.beginPath(); ctx.arc(rx+58, ry+2, 5, 0, Math.PI*2); ctx.fillStyle = '#2C332B'; ctx.fill();
+          ctx.font = 'bold 22px "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif';
+          ctx.fillStyle = '#C04040';
+          ctx.textAlign = 'center';
+          ctx.fillText('r', CIRCLE_CX + R * 0.5, CIRCLE_CY - R * 0.3);
+          ctx.fillStyle = '#2A5A8A';
+          ctx.fillText('C = 2πr', CIRCLE_CX, CIRCLE_CY - R - 20);
+          ctx.restore();
+        }
 
-  /* 曲柄与踏板（随车架） */
-  const ca = D / 20, cbx = rx+58, cby = ry+2;
-  const pedals = [0, Math.PI].map(o => ({ x: cbx + Math.cos(ca+o)*11, y: cby + Math.sin(ca+o)*11 }));
+        const edgeWidth = N >= 128 ? 0.5 : 1.5;
 
-  /* 远侧腿（暗色，画在躯干后面） */
-  const kneeB = ik(R.hip.x, R.hip.y, pedals[1].x, pedals[1].y, 41, 41, -1);
-  tube(R.hip.x, R.hip.y, kneeB.x, kneeB.y, 8, '#232B31');
-  tube(kneeB.x, kneeB.y, pedals[1].x, pedals[1].y, 7, '#232B31');
-  ctx.beginPath(); ctx.ellipse(pedals[1].x+3, pedals[1].y, 7, 4, 0, 0, Math.PI*2);
-  ctx.fillStyle = '#232B31'; ctx.fill();
+        // 蓝排
+        for (let k = 0; k < halfN; k++) {
+          const i = 2 * k;
+          const startApexX = CIRCLE_CX;
+          const startApexY = CIRCLE_CY;
+          const startMidAngle = i * angleStep - Math.PI / 2 + angleStep / 2;
 
-  /* 躯干 + 头 + 头盔 + 表情 */
-  tube(R.hip.x, R.hip.y, R.shoulder.x, R.shoulder.y, 11, '#3E7C8F');
-  ctx.beginPath(); ctx.arc(R.head.x, R.head.y, 11.5, 0, Math.PI*2);
-  ctx.fillStyle = '#F2C29B'; ctx.fill();
-  ctx.lineWidth = 2.4; ctx.strokeStyle = '#2C332B'; ctx.stroke();
-  ctx.beginPath(); ctx.arc(R.head.x, R.head.y, 12.5, Math.PI, Math.PI*2); // 头盔
-  ctx.fillStyle = '#E9A03B'; ctx.fill(); ctx.stroke();
-  tube(R.head.x+6, R.head.y-12.5, R.head.x+16, R.head.y-9, 4, '#E9A03B'); // 帽檐
-  ctx.fillStyle = '#2C332B';
-  if (surprised){
-    ctx.lineWidth = 1.8; ctx.strokeStyle = '#2C332B';
-    ctx.beginPath(); ctx.arc(R.head.x+5.5, R.head.y-1, 2.6, 0, Math.PI*2); ctx.stroke();
-    ctx.beginPath(); ctx.arc(R.head.x+4.5, R.head.y+5.5, 3.2, 0, Math.PI*2);
-    ctx.fillStyle = '#8A4B3A'; ctx.fill();
-  } else {
-    ctx.beginPath(); ctx.arc(R.head.x+6, R.head.y-1.5, 1.7, 0, Math.PI*2); ctx.fill();
-    ctx.lineWidth = 2; ctx.strokeStyle = '#2C332B';
-    ctx.beginPath(); ctx.arc(R.head.x+3.5, R.head.y+3, 4.2, .15*Math.PI, .85*Math.PI); ctx.stroke();
-  }
+          const targetApexX = blueX0 + k * chordLen;
+          const targetApexY = blueApexY;
+          const targetMidAngle = -Math.PI / 2;
 
-  /* 近侧腿 */
-  const kneeA = ik(R.hip.x, R.hip.y, pedals[0].x, pedals[0].y, 41, 41, -1);
-  tube(R.hip.x, R.hip.y, kneeA.x, kneeA.y, 9, '#35414B');
-  tube(kneeA.x, kneeA.y, pedals[0].x, pedals[0].y, 8, '#35414B');
-  ctx.beginPath(); ctx.ellipse(pedals[0].x+3, pedals[0].y, 7.5, 4.2, 0, 0, Math.PI*2);
-  ctx.fillStyle = '#2C332B'; ctx.fill();
+          const apexX = startApexX + (targetApexX - startApexX) * rowT;
+          const apexY = startApexY + (targetApexY - startApexY) * rowT;
+          const midAngle = startMidAngle + (targetMidAngle - startMidAngle) * rowT;
 
-  /* 手臂（IK 握把） */
-  const hand = { x: rx+136, y: ry-60 };
-  const elbow = ik(R.shoulder.x, R.shoulder.y, hand.x, hand.y, 32, 32, 1);
-  tube(R.shoulder.x, R.shoulder.y, elbow.x, elbow.y, 8, '#3E7C8F');
-  tube(elbow.x, elbow.y, hand.x, hand.y, 7, '#3E7C8F');
-  ctx.beginPath(); ctx.arc(hand.x, hand.y, 4, 0, Math.PI*2); ctx.fillStyle = '#F2C29B'; ctx.fill();
-  ctx.lineWidth = 2; ctx.strokeStyle = '#2C332B'; ctx.stroke();
+          drawSector(apexX, apexY, midAngle, angleStep, BLUE, edgeWidth);
+        }
 
-  /* 围巾（绳索物理） */
-  for (let i = 1; i < scarf.length; i++){
-    ctx.strokeStyle = '#E4572E'; ctx.lineCap = 'round';
-    ctx.lineWidth = 7.5 - i * 1.1;
-    ctx.beginPath(); ctx.moveTo(scarf[i-1].x, scarf[i-1].y); ctx.lineTo(scarf[i].x, scarf[i].y); ctx.stroke();
-  }
-}
+        // 红排
+        for (let k = 0; k < halfN; k++) {
+          const i = 2 * k + 1;
+          const startApexX = CIRCLE_CX;
+          const startApexY = CIRCLE_CY;
+          const startMidAngle = i * angleStep - Math.PI / 2 + angleStep / 2;
 
-/* ---------- 背景 ---------- */
-function drawBackground(){
-  ctx.fillStyle = '#FDF7E8'; ctx.fillRect(0, 0, VW, VH);
+          const targetApexX = blueX0 + k * chordLen + redOffsetX;
+          const targetApexY = redApexY;
+          const targetMidAngle = Math.PI / 2;
 
-  ctx.save(); ctx.translate(66, 92); ctx.rotate(sunT * .12);
-  ctx.strokeStyle = '#E9B45C'; ctx.lineWidth = 3; ctx.lineCap = 'round';
-  for (let i = 0; i < 10; i++){
-    const a = i * Math.PI / 5;
-    ctx.beginPath();
-    ctx.moveTo(Math.cos(a)*32, Math.sin(a)*32);
-    ctx.lineTo(Math.cos(a)*40, Math.sin(a)*40);
-    ctx.stroke();
-  }
-  ctx.restore();
-  ctx.beginPath(); ctx.arc(66, 92, 24, 0, Math.PI*2);
-  ctx.fillStyle = '#F5C563'; ctx.fill();
-  ctx.lineWidth = 2.6; ctx.strokeStyle = '#2C332B'; ctx.stroke();
+          const apexX = startApexX + (targetApexX - startApexX) * rowT;
+          const apexY = startApexY + (targetApexY - startApexY) * rowT;
+          const midAngle = startMidAngle + (targetMidAngle - startMidAngle) * rowT;
 
-  ctx.fillStyle = '#EFE5C9';
-  [[180,120],[760,150],[1300,110]].forEach(([wx, r]) => {
-    const x = mod(wx - D * .12, 1650) - 220;
-    ctx.beginPath(); ctx.arc(x, GROUND_Y, r, Math.PI, 0); ctx.fill();
-  });
-  ctx.fillStyle = '#FFFFFF'; ctx.strokeStyle = '#E3D6B5'; ctx.lineWidth = 2;
-  [[150,58,1],[560,105,.8],[980,72,.9]].forEach(([wx, y, s]) => {
-    const x = mod(wx - D * .3, 1300) - 180;
-    ctx.beginPath();
-    ctx.arc(x, y, 15*s, 0, Math.PI*2);
-    ctx.arc(x+19*s, y-6*s, 12*s, 0, Math.PI*2);
-    ctx.arc(x+36*s, y+2*s, 13*s, 0, Math.PI*2);
-    ctx.fill(); ctx.stroke();
-  });
+          drawSector(apexX, apexY, midAngle, angleStep, RED, edgeWidth);
+        }
 
-  ctx.fillStyle = '#DCCB9F'; ctx.fillRect(0, GROUND_Y, VW, VH - GROUND_Y);
-  ctx.strokeStyle = '#2C332B'; ctx.lineWidth = 3.5;
-  ctx.beginPath(); ctx.moveTo(0, GROUND_Y); ctx.lineTo(VW, GROUND_Y); ctx.stroke();
-  ctx.save();
-  ctx.strokeStyle = '#C4AF83'; ctx.lineWidth = 3.5; ctx.setLineDash([26, 34]);
-  ctx.lineDashOffset = -mod(D, 60);
-  ctx.beginPath(); ctx.moveTo(0, GROUND_Y+38); ctx.lineTo(VW, GROUND_Y+38); ctx.stroke();
-  ctx.restore();
+        // 平行四边形轮廓和长/宽标注
+        if (annotationAlpha > 0) {
+          const redX0 = blueX0 + R * sinHalf;
+          const pTL = { x: blueX0 - R * sinHalf, y: blueApexY - R * cosHalf };
+          const pTR = { x: blueX0 + (halfN - 1) * chordLen + R * sinHalf, y: blueApexY - R * cosHalf };
+          const pBR = { x: redX0 + (halfN - 1) * chordLen + R * sinHalf, y: redApexY + R * cosHalf };
+          const pBL = { x: redX0 - R * sinHalf, y: redApexY + R * cosHalf };
 
-  const trees = [[90,'t'],[360,'b'],[610,'t'],[880,'b'],[1120,'t'],[1330,'b']];
-  trees.forEach(([wx, type]) => {
-    const x = mod(wx - D, 1520) - 240;
-    if (x < -60 || x > VW + 60) return;
-    if (type === 't'){
-      ctx.fillStyle = '#8A6B47'; ctx.fillRect(x-3, GROUND_Y-26, 6, 26);
-      ctx.beginPath(); ctx.arc(x, GROUND_Y-42, 23, 0, Math.PI*2);
-      ctx.fillStyle = '#8FBF6A'; ctx.fill();
-      ctx.lineWidth = 2.4; ctx.strokeStyle = '#2C332B'; ctx.stroke();
-      ctx.beginPath(); ctx.arc(x-7, GROUND_Y-48, 8, 0, Math.PI*2);
-      ctx.fillStyle = '#A8D483'; ctx.fill();
-    } else {
-      ctx.beginPath(); ctx.arc(x, GROUND_Y-9, 12, Math.PI, 0);
-      ctx.fillStyle = '#7FAF5F'; ctx.fill();
-      ctx.lineWidth = 2.2; ctx.strokeStyle = '#2C332B'; ctx.stroke();
-    }
-  });
-  for (let i = 0; i < 14; i++){
-    const wx = i * 118 + (i*137 % 40);
-    const x = mod(wx - D, 1690) - 100;
-    if (x < -20 || x > VW + 20) continue;
-    ctx.strokeStyle = '#6E9A4E'; ctx.lineWidth = 2.2; ctx.lineCap = 'round';
-    if (i % 3 === 2){
-      ctx.beginPath(); ctx.moveTo(x, GROUND_Y); ctx.lineTo(x, GROUND_Y-11); ctx.stroke();
-      ctx.beginPath(); ctx.arc(x, GROUND_Y-14, 4, 0, Math.PI*2);
-      ctx.fillStyle = i % 2 ? '#E4572E' : '#E9A03B'; ctx.fill();
-    } else {
-      ctx.beginPath();
-      ctx.moveTo(x, GROUND_Y); ctx.quadraticCurveTo(x-4, GROUND_Y-9, x-6, GROUND_Y-13);
-      ctx.moveTo(x, GROUND_Y); ctx.quadraticCurveTo(x+1, GROUND_Y-11, x+1, GROUND_Y-15);
-      ctx.moveTo(x, GROUND_Y); ctx.quadraticCurveTo(x+5, GROUND_Y-8, x+7, GROUND_Y-12);
-      ctx.stroke();
-    }
-  }
-}
+          ctx.save();
+          ctx.globalAlpha = annotationAlpha * 0.95;
 
-/* ---------- 左上：当前车轮信息 ---------- */
-function drawInfo(){
-  const c = SHAPES[shape];
-  const w = 158;
-  ctx.save();
-  ctx.beginPath(); ctx.roundRect(14, 12, w, 34, 10);
-  ctx.fillStyle = 'rgba(255,253,246,.92)'; ctx.fill();
-  ctx.lineWidth = 2.2; ctx.strokeStyle = '#2C332B'; ctx.stroke();
-  ctx.beginPath();
-  if (shape === 'circle')       ctx.arc(33, 29, 9, 0, Math.PI*2);
-  else if (shape === 'ellipse') ctx.ellipse(33, 29, 11, 7.5, 0, 0, Math.PI*2);
-  else if (shape === 'triangle'){ ctx.moveTo(33,19); ctx.lineTo(43,37); ctx.lineTo(23,37); ctx.closePath(); }
-  else if (shape === 'square')  ctx.rect(25, 21, 16, 16);
-  else if (shape === 'pentagon'){ ctx.moveTo(33,19); ctx.lineTo(42.5,25.9); ctx.lineTo(38.9,37.1); ctx.lineTo(27.1,37.1); ctx.lineTo(23.5,25.9); ctx.closePath(); }
-  else { ctx.moveTo(28,37.7); ctx.lineTo(23,29); ctx.lineTo(28,20.3); ctx.lineTo(38,20.3); ctx.lineTo(43,29); ctx.lineTo(38,37.7); ctx.closePath(); }
-  ctx.fillStyle = c.light; ctx.fill();
-  ctx.lineWidth = 2.4; ctx.lineJoin = 'miter'; ctx.stroke();
-  ctx.fillStyle = '#2C332B';
-  ctx.font = '16px "ZCOOL KuaiLe", sans-serif';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(c.name + '车轮', 52, 30);
-  ctx.restore();
-}
+          ctx.beginPath();
+          ctx.setLineDash([8, 6]);
+          ctx.strokeStyle = '#2A5A8A';
+          ctx.lineWidth = 2.5;
+          ctx.moveTo(pTL.x, pTL.y);
+          ctx.lineTo(pTR.x, pTR.y);
+          ctx.lineTo(pBR.x, pBR.y);
+          ctx.lineTo(pBL.x, pBL.y);
+          ctx.closePath();
+          ctx.stroke();
+          ctx.setLineDash([]);
 
-/* ---------- 右上：轮心轨迹图（按前进距离采样，纵轴覆盖所有形状高度） ---------- */
-function drawScope(){
-  const w = 252, h = 100, x = VW - w - 14, y = 12;
-  ctx.save();
-  ctx.beginPath(); ctx.roundRect(x, y, w, h, 12);
-  ctx.fillStyle = 'rgba(255,253,246,.92)'; ctx.fill();
-  ctx.lineWidth = 2.2; ctx.strokeStyle = '#2C332B'; ctx.stroke();
-  ctx.fillStyle = '#2C332B';
-  ctx.font = '13px "ZCOOL KuaiLe", sans-serif';
-  ctx.textBaseline = 'alphabetic';
-  ctx.fillText('轮心轨迹', x + 12, y + 19);
+          // ★ 长标注（原"底 ≈ πr"）
+          ctx.font = 'bold 20px "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif';
+          ctx.fillStyle = '#C04040';
+          ctx.textAlign = 'center';
+          ctx.beginPath();
+          ctx.setLineDash([6, 6]);
+          ctx.strokeStyle = '#C04040';
+          ctx.lineWidth = 1.8;
+          ctx.moveTo(pBL.x, pBL.y + 28);
+          ctx.lineTo(pBR.x, pBR.y + 28);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillText('长 ≈ πr', (pBL.x + pBR.x) / 2, pBL.y + 55);
 
-  const x0 = x + 10, x1 = x + w - 10, yTop = y + 26, innerH = h - 46;
-  const HMIN = 24, HMAX = 68;      // 覆盖全部形状：三角最低 ≈27.7，方最高 65；圆轮线恰居中
-  const Y = hh => yTop + (1 - (hh - HMIN) / (HMAX - HMIN)) * innerH;
+          // ★ 宽标注（原"高 ≈ r"）
+          ctx.fillStyle = '#3A70B0';
+          ctx.textAlign = 'right';
+          ctx.beginPath();
+          ctx.setLineDash([6, 6]);
+          ctx.strokeStyle = '#3A70B0';
+          ctx.lineWidth = 1.8;
+          const highLeftX = Math.min(pTL.x, pBL.x) - 30;
+          ctx.moveTo(highLeftX, pTL.y);
+          ctx.lineTo(highLeftX, pBL.y);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(highLeftX - 8, pTL.y);
+          ctx.lineTo(highLeftX + 8, pTL.y);
+          ctx.moveTo(highLeftX - 8, pBL.y);
+          ctx.lineTo(highLeftX + 8, pBL.y);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillText('宽 ≈ r', highLeftX - 12, (pTL.y + pBL.y) / 2 + 6);
 
-  // 参考线：圆轮的轨迹（恒为半径）
-  const gy = Y(WHEEL_R);
-  ctx.strokeStyle = 'rgba(44,51,43,.3)'; ctx.lineWidth = 1.4; ctx.setLineDash([4,4]);
-  ctx.beginPath(); ctx.moveTo(x0, gy); ctx.lineTo(x1, gy); ctx.stroke();
-  ctx.setLineDash([]);
-  ctx.fillStyle = 'rgba(44,51,43,.55)'; ctx.font = '10.5px "Noto Sans SC"';
-  ctx.textAlign = 'right';
-  ctx.fillText('圆轮：恒为半径', x1 - 2, gy - 5);
-  ctx.textAlign = 'left';
+          ctx.restore();
+        }
 
-  // 轨迹曲线（换轮时颜色分段跟随，可直接对比前后形状）
-  const M = Math.min(trail.length, Math.floor((x1 - x0) / TRAIL_STEP));
-  if (M >= 2){
-    const start = trail.length - M;
-    ctx.lineWidth = 2.4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-    for (let i = start + 1; i < trail.length; i++){
-      const a = trail[i-1], b = trail[i];
-      const xa = x0 + (i - 1 - start) / (M - 1) * (x1 - x0);
-      const xb = x0 + (i - start) / (M - 1) * (x1 - x0);
-      ctx.strokeStyle = b.c;
-      ctx.beginPath();
-      ctx.moveTo(xa, Y(a.h)); ctx.lineTo(xb, Y(b.h));
-      ctx.stroke();
-    }
-  }
-  // 当前点 + 读数
-  const hNow = axleH(shape, D + off);
-  const cy = Y(Math.max(HMIN, Math.min(HMAX, hNow)));
-  ctx.beginPath(); ctx.arc(x1, cy, 3.5, 0, Math.PI*2);
-  ctx.fillStyle = SHAPES[shape].color; ctx.fill();
-  ctx.lineWidth = 1.6; ctx.strokeStyle = '#2C332B'; ctx.stroke();
-  ctx.fillStyle = '#2C332B'; ctx.font = '10.5px "Noto Sans SC"';
-  ctx.fillText(Math.round(hNow) + 'px', x0, y + h - 6);
-  ctx.textAlign = 'right'; ctx.fillStyle = 'rgba(44,51,43,.55)';
-  ctx.fillText('前进方向 →', x1, y + h - 6);
-  ctx.textAlign = 'left';
-  ctx.restore();
-}
+        // 平行四边形内部的 S = πr²（只在阶段4 显示）
+        if (showAnnotation) {
+          const redX0 = blueX0 + R * sinHalf;
+          const pTL = { x: blueX0 - R * sinHalf, y: blueApexY - R * cosHalf };
+          const pBR = { x: redX0 + (halfN - 1) * chordLen + R * sinHalf, y: redApexY + R * cosHalf };
+          const pBL = { x: redX0 - R * sinHalf, y: redApexY + R * cosHalf };
 
-/* ---------- 主循环 ---------- */
-let last = performance.now();
-function loop(now){
-  const dt = Math.min((now - last) / 1000, .05);
-  last = now;
-  switchFx = Math.max(0, switchFx - dt * 4);
-  jolt = Math.max(0, jolt - dt * 1.4);
-  if (!paused){
-    D += speed * dt;
-    sunT += dt;
-    updateDynamics(dt);
-    updateParticles(dt);
-  }
-  shake *= Math.pow(.002, dt);
+          ctx.save();
+          ctx.font = 'bold 32px "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif';
+          ctx.fillStyle = '#1a4a7a';
+          ctx.shadowColor = 'rgba(60,100,160,0.25)';
+          ctx.shadowBlur = 10;
+          ctx.textAlign = 'center';
+          ctx.fillText('S = πr²', (pTL.x + pBR.x) / 2, (pTL.y + pBL.y) / 2 + 10);
+          ctx.restore();
+        }
+      }
 
-  ctx.clearRect(0, 0, VW, VH);
-  ctx.save();
-  if (shake > .3) ctx.translate((Math.random()-.5) * shake, (Math.random()-.5) * shake);
-  drawBackground();
-  drawTrail();
-  drawBike();
-  particles.forEach(p => {
-    ctx.globalAlpha = Math.max(0, 1 - p.t / p.life);
-    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-    ctx.fillStyle = '#C0AE89'; ctx.fill();
-  });
-  ctx.globalAlpha = 1;
-  ctx.restore();
+      function drawSector(apexX, apexY, midAngle, spread, fillColor, edgeWidth) {
+        const halfSpread = spread / 2;
+        const a1 = midAngle - halfSpread;
+        const a2 = midAngle + halfSpread;
 
-  drawInfo();
-  drawScope();
-  requestAnimationFrame(loop);
-}
-updateTip();
-if (document.fonts && document.fonts.load){
-  document.fonts.load('16px "ZCOOL KuaiLe"');
-}
-requestAnimationFrame(loop);
-</script>
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(apexX, apexY);
+        ctx.arc(apexX, apexY, R, a1, a2, false);
+        ctx.closePath();
+        ctx.fillStyle = fillColor;
+        ctx.fill();
+        ctx.strokeStyle = EDGE;
+        ctx.lineWidth = edgeWidth || 1.5;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function animate(timestamp) {
+        if (!lastTimestamp) lastTimestamp = timestamp;
+        const delta = Math.min(timestamp - lastTimestamp, 60);
+        lastTimestamp = timestamp;
+
+        if (isPlaying && animationProgress < 1) {
+          const baseStep = (delta / 1000) * 0.22 * FIXED_SPEED;
+          const slowdown = 0.45 + 0.55 * Math.abs(Math.sin(animationProgress * Math.PI * 2));
+          const step = baseStep * slowdown;
+          animationProgress = Math.min(animationProgress + step, 1);
+
+          let autoStage = 0;
+          if (animationProgress < 0.2) {
+            autoStage = 0;
+          } else if (animationProgress < 0.55) {
+            autoStage = 1;
+          } else if (animationProgress < 0.85) {
+            autoStage = 2;
+          } else {
+            autoStage = 3;
+          }
+
+          if (autoStage !== currentStage) {
+            currentStage = autoStage;
+            updateStageIndicator();
+          }
+
+          setExplainText(animationProgress, currentStage);
+          drawCanvas();
+
+          if (animationProgress >= 1) {
+            isPlaying = false;
+            currentStage = 3;
+            forceShowAnnotation = true;
+            updateStageIndicator();
+            setExplainText(1, 3);
+            drawCanvas();
+          }
+        }
+
+        if (!isPlaying && Math.abs(animationProgress - targetProgress) > 0.004) {
+          const diff = targetProgress - animationProgress;
+          const step = Math.sign(diff) * Math.min(Math.abs(diff), (delta / 1000) * 0.3 * FIXED_SPEED);
+          animationProgress += step;
+          setExplainText(animationProgress);
+          drawCanvas();
+        }
+
+        animationFrame = requestAnimationFrame(animate);
+      }
+
+      animationFrame = requestAnimationFrame(animate);
+
+      function resetAll() {
+        animationProgress = 0;
+        targetProgress = 0;
+        isPlaying = false;
+        currentStage = 0;
+        forceShowAnnotation = false;
+        updateStageIndicator();
+        setExplainText(0, 0);
+        drawCanvas();
+      }
+
+      partsSlider.addEventListener('input', (e) => {
+        partsCount = sliderIndexToParts(parseInt(e.target.value, 10));
+        updatePartsDisplay();
+        resetAll();
+      });
+
+      startBtn.addEventListener('click', () => {
+        resetAll();
+        targetProgress = 1;
+        isPlaying = true;
+        lastTimestamp = 0;
+      });
+
+      stepBtn.addEventListener('click', () => {
+        isPlaying = false;
+
+        if (currentStage < 3) {
+          currentStage++;
+        } else {
+          resetAll();
+          return;
+        }
+
+        updateStageIndicator();
+
+        if (currentStage === 0) {
+          targetProgress = 0;
+          forceShowAnnotation = false;
+        } else if (currentStage === 1) {
+          targetProgress = 0.55;
+          forceShowAnnotation = false;
+        } else if (currentStage === 2) {
+          targetProgress = 1.0;
+          forceShowAnnotation = false;
+        } else if (currentStage === 3) {
+          targetProgress = 1.0;
+          forceShowAnnotation = true;
+        }
+
+        setExplainText(targetProgress, currentStage);
+        lastTimestamp = 0;
+        drawCanvas();
+      });
+
+      resetBtn.addEventListener('click', () => { resetAll(); });
+
+      function init() {
+        partsCount = sliderIndexToParts(parseInt(partsSlider.value, 10));
+        updatePartsDisplay();
+        updateStageIndicator();
+        setExplainText(0, 0);
+        drawCanvas();
+      }
+
+      init();
+      window.addEventListener('resize', () => drawCanvas());
+    })();
+  </script>
 </body>
 </html>
